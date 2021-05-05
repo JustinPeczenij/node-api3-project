@@ -37,8 +37,8 @@ router.put('/:id', validateUserId, validateUser, async (req, res, next) => {
   // RETURN THE FRESHLY UPDATED USER OBJECT
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
-  await Users.update(req.params.id, req.body)
   try{
+    await Users.update(req.params.id, req.body)
     const updatedUser = await Users.getById(req.params.id)
     res.status(200).json(updatedUser)
   } catch(err) {
@@ -50,10 +50,10 @@ router.put('/:id', validateUserId, validateUser, async (req, res, next) => {
 router.delete('/:id', validateUserId, async (req, res, next) => {
   // RETURN THE FRESHLY DELETED USER OBJECT
   // this needs a middleware to verify user id
-  const deletedUser = await Users.getById(req.params.id)
-  await Users.remove(req.params.id)
   try{
-    res.status(200).json({message: 'user was deleted', deletedUser: deletedUser})
+    const deletedUser = await Users.getById(req.params.id)
+    await Users.remove(req.params.id)
+    res.status(200).json(deletedUser)
   } catch(err) {
     next(err)
   }
@@ -62,8 +62,8 @@ router.delete('/:id', validateUserId, async (req, res, next) => {
 router.get('/:id/posts', validateUserId, async (req, res, next) => {
   // RETURN THE ARRAY OF USER POSTS
   // this needs a middleware to verify user id
-  const posts = await Users.getUserPosts(req.params.id)
   try{
+    const posts = await Users.getUserPosts(req.params.id)
     if(posts.length === 0){
       next({ status: 404, message: 'this user has no posts' })
     } else {
@@ -74,10 +74,19 @@ router.get('/:id/posts', validateUserId, async (req, res, next) => {
   }
 });
 
-router.post('/:id/posts', (req, res) => {
+router.post('/:id/posts', validateUserId, validatePost, async (req, res, next) => {
   // RETURN THE NEWLY CREATED USER POST
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
+  try {
+    const newPost = await Posts.insert({
+      user_id: req.params.id, 
+      text: req.text
+    })
+    res.status(201).json(newPost)
+  } catch(err) {
+    next(err)
+  }
 });
 
 // Catches errors that happen in routes
