@@ -1,9 +1,23 @@
+const Users = require('../users/users-model')
+
 function logger(req, res, next) {
   // DO YOUR MAGIC
 }
 
-function validateUserId(req, res, next) {
+async function validateUserId(req, res, next) {
   // DO YOUR MAGIC
+  try {
+    const user = await Users.getById(req.params.id)
+    if (!user) {
+      next({ status: 404, message: `user with ${req.params.id} does not exist`})
+    } else {
+      req.user = user
+      next()
+    }
+  }
+  catch(err) {
+    next(err)
+  }
 }
 
 function validateUser(req, res, next) {
@@ -15,3 +29,9 @@ function validatePost(req, res, next) {
 }
 
 // do not forget to expose these functions to other modules
+module.exports = {
+  logger,
+  validateUserId,
+  validateUser,
+  validatePost
+}
