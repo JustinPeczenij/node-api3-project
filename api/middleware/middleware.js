@@ -2,6 +2,11 @@ const Users = require('../users/users-model')
 
 function logger(req, res, next) {
   // DO YOUR MAGIC
+  console.log(`
+    \n ${req.method} request to ${req.baseUrl} \
+    \n @[${new Date().toString()}] \
+  `)
+  next()
 }
 
 async function validateUserId(req, res, next) {

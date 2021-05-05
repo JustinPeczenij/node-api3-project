@@ -6,6 +6,7 @@ const Posts = require('../posts/posts-model')
 // The middleware functions also need to be required
 
 const router = express.Router();
+router.use(logger)
 
 router.get('/', (req, res, next) => {
   // RETURN AN ARRAY WITH ALL THE USERS
